@@ -38,4 +38,35 @@ defmodule WatwitterWeb.TimeLineLiveTest do
 
     assert has_element?(view, "#show-post-#{post.id}")
   end
+
+  test "user can visir highlighted post url", %{conn: conn} do
+    post = insert(:post)
+    {:ok, view, _html} = live(conn, Routes.timeline_path(conn, :index, post_id: post.id))
+
+    assert has_element?(view, "#show-post-#{post.id}")
+  end
+
+  test "user can navigate to user settings", %{conn: conn} do
+    {:ok, view, _html} = live(conn, "/")
+
+    {:ok, conn} =
+      view
+      |> element("#user-avatar")
+      |> render_click()
+      |> follow_redirect(conn, Routes.user_settings_path(conn, :edit))
+
+    assert html_response(conn, 200) =~ "Settings"
+  end
+
+  test "user can compose new post from timeline", %{conn: conn} do
+    {:ok, view, _html} = live(conn, "/")
+
+    {:ok, _compose_view, html} =
+      view
+      |> element("#compose-button")
+      |> render_click()
+      |> follow_redirect(conn, Routes.compose_path(conn, :new))
+
+    assert html =~ "Compose Watweet"
+  end
 end

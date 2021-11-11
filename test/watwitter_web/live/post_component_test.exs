@@ -4,6 +4,7 @@ defmodule WatwitterWeb.PostComponentTest do
   import Phoenix.LiveViewTest
   import Watwitter.Factory
 
+  alias Watwitter.Timeline.Like
   alias WatwitterWeb.PostComponent
   alias WatwitterWeb.DateHelpers
 
@@ -32,8 +33,20 @@ defmodule WatwitterWeb.PostComponentTest do
 
     html = render_component(PostComponent, post: post, current_user: post.user)
 
-    assert html =~ "data-role=\"like-button\""
-    assert html =~ "data-role=\"like-count\""
+    assert html =~ data_role("like-button")
+    assert html =~ data_role("like-count")
     assert html =~ "1337"
   end
+
+  test "redners liked button when current user likes post" do
+    current_user = insert(:user)
+    post = insert(:post, likes: [%Like{user_id: current_user.id}])
+
+    html = render_component(PostComponent, post: post, current_user: current_user)
+
+    assert html =~ data_role("post-liked")
+    refute html =~ data_role("like-button")
+  end
+
+  defp data_role(role), do: "data-role=\"#{role}\""
 end
