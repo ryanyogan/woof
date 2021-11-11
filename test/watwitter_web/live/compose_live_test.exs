@@ -26,4 +26,27 @@ defmodule WatwitterWeb.ComposeLiveTest do
 
     assert rendered =~ "can&apos;t be blank"
   end
+
+  test "user is notified of errors prior to submission", %{conn: conn} do
+    {:ok, view, _html} = live(conn, Routes.compose_path(conn, :new))
+
+    rendered =
+      view
+      |> form("#new-post", post: %{body: nil})
+      |> render_change()
+
+    assert rendered =~ "can&apos;t be blank"
+  end
+
+  test "user is notified that post is over 250 characters", %{conn: conn} do
+    {:ok, view, _html} = live(conn, Routes.compose_path(conn, :new))
+    body = 1..251 |> Enum.map(&to_string/1) |> Enum.join()
+
+    rendered =
+      view
+      |> form("#new-post", post: %{body: body})
+      |> render_change()
+
+    assert rendered =~ "should be at most 250 character(s)"
+  end
 end
