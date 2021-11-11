@@ -1,4 +1,7 @@
 <div class="header">
+  <%= live_redirect to: Routes.timeline_path(@conn, :index) do %>
+		<%= SVGHelpers.back_svg() %>
+	<% end %>
   <h1 class="header-title">Settings</h1>
 </div>
 
