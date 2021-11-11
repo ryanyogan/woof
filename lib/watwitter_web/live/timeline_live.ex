@@ -12,63 +12,41 @@ defmodule WatwitterWeb.TimelineLive do
     end
 
     current_user = Accounts.get_user_by_session_token(session["user_token"])
-    posts = Timeline.list_posts()
+    post_ids = Timeline.list_post_ids()
 
     {:ok,
      assign(socket,
-       current_post: nil,
        current_user: current_user,
-       posts: posts,
        new_posts_count: 0,
-       new_posts: []
+       new_post_ids: [],
+       post_ids: post_ids,
+       current_post_id: nil
      )}
   end
 
   @impl true
   def handle_params(%{"post_id" => post_id}, _, socket) do
     id = String.to_integer(post_id)
-    current_post = Enum.find(socket.assigns.posts, &(&1.id == id))
 
-    {:noreply, socket |> assign(current_post: current_post)}
+    {:noreply, socket |> assign(current_post_id: id)}
   end
 
   def handle_params(_, _, socket), do: {:noreply, socket}
+
+  @impl true
+  def handle_event("show-new-posts", _, socket) do
+    {:noreply,
+     socket
+     |> update(:post_ids, fn post_ids -> socket.assigns.new_post_ids ++ post_ids end)
+     |> assign(:new_post_ids, [])
+     |> assign(:new_posts_count, 0)}
+  end
 
   @impl true
   def handle_info({:post_created, post}, socket) do
     {:noreply,
      socket
      |> update(:new_posts_count, &(&1 + 1))
-     |> update(:new_posts, &[post | &1])}
-  end
-
-  @impl true
-  def handle_event("show-new-posts", _, socket) do
-    {:noreply,
-     socket
-     |> update(:posts, fn posts -> socket.assigns.new_posts ++ posts end)
-     |> assign(:new_posts, [])
-     |> assign(:new_posts_count, 0)}
-  end
-
-  @impl true
-  def handle_event("like", %{"post_id" => post_id}, socket) do
-    current_user = socket.assigns.current_user
-
-    updated_post =
-      post_id
-      |> Timeline.get_post!()
-      |> Timeline.like_post!(current_user)
-
-    socket =
-      socket
-      |> update(:posts, fn posts ->
-        Enum.map(posts, fn
-          %{id: id} when id == updated_post.id -> updated_post
-          post -> post
-        end)
-      end)
-
-    {:noreply, socket}
+     |> update(:new_post_ids, &[post.id | &1])}
   end
 end

@@ -1,6 +1,17 @@
 defmodule WatwitterWeb.PostComponent do
   use WatwitterWeb, :live_component
   alias WatwitterWeb.{DateHelpers, SVGHelpers}
+  alias Watwitter.Timeline
+
+  @impl true
+  def preload(list_of_assigns) do
+    list_of_ids = Enum.map(list_of_assigns, & &1.id)
+    posts = Timeline.get_posts(list_of_ids)
+
+    Enum.map(list_of_assigns, fn assigns ->
+      Map.put(assigns, :post, Enum.find(posts, fn post -> post.id == assigns.id end))
+    end)
+  end
 
   @impl true
   def render(assigns) do
@@ -50,7 +61,7 @@ defmodule WatwitterWeb.PostComponent do
               </span>
             </a>
           <% else %>
-            <a class="post-action" href="#" phx-click="like" phx-value-post_id="<%= @post.id %>" data-role="like-button">
+            <a class="post-action" href="#" phx-click="like" phx-target="<%= @myself %>" data-role="like-button">
               <%= SVGHelpers.like_svg() %>
               <span class="post-action-count" data-role="like-count">
                 <%= @post.likes_count %>
@@ -64,6 +75,15 @@ defmodule WatwitterWeb.PostComponent do
       </div>
     </div>
     """
+  end
+
+  @impl true
+  def handle_event("like", _, socket) do
+    current_user = socket.assigns.current_user
+    post = socket.assigns.post
+    updated_post = Timeline.like_post!(post, current_user)
+
+    {:noreply, assign(socket, :post, updated_post)}
   end
 
   defp current_user_liked?(post, user) do

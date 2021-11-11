@@ -2,7 +2,19 @@ defmodule WatwitterWeb.ShowPostComponent do
   use WatwitterWeb, :live_component
 
   alias WatwitterWeb.SVGHelpers
+  alias Watwitter.Timeline
 
+  @impl true
+  def preload(list_of_assigns) do
+    list_of_ids = Enum.map(list_of_assigns, & &1.id)
+    posts = Timeline.get_posts(list_of_ids)
+
+    Enum.map(list_of_assigns, fn assigns ->
+      Map.put(assigns, :post, Enum.find(posts, fn post -> post.id == assigns.id end))
+    end)
+  end
+
+  @impl true
   def render(assigns) do
     ~L"""
     <div class="show-post" id="show-post-<%= @post.id %>">
