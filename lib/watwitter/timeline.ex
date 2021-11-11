@@ -63,7 +63,12 @@ defmodule Watwitter.Timeline do
     %Post{}
     |> Post.changeset(attrs)
     |> Repo.insert()
+    |> preload_timeline_data()
+    |> broadcast()
   end
+
+  defp preload_timeline_data({:error, _} = error), do: error
+  defp preload_timeline_data({:ok, post}), do: {:ok, Repo.preload(post, [:user, :likes])}
 
   @doc """
   Likes a post.
@@ -96,5 +101,24 @@ defmodule Watwitter.Timeline do
   """
   def change_post(%Post{} = post, attrs \\ %{}) do
     Post.changeset(post, attrs)
+  end
+
+  @doc """
+  Subscribes process to timeline events
+  """
+  @timeline_topic "timeline"
+  def subscribe do
+    Phoenix.PubSub.subscribe(Watwitter.PubSub, @timeline_topic)
+  end
+
+  def broadcast_post_created(post) do
+    Phoenix.PubSub.broadcast(Watwitter.PubSub, @timeline_topic, {:post_created, post})
+  end
+
+  defp broadcast({:error, _} = error), do: error
+
+  defp broadcast({:ok, post} = ok_tuple) do
+    broadcast_post_created(post)
+    ok_tuple
   end
 end

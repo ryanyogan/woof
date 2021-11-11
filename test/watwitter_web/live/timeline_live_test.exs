@@ -2,6 +2,7 @@ defmodule WatwitterWeb.TimeLineLiveTest do
   use WatwitterWeb.ConnCase
   import Phoenix.LiveViewTest
   import Watwitter.Factory
+  alias Watwitter.Timeline
 
   setup :register_and_log_in_user
 
@@ -68,5 +69,16 @@ defmodule WatwitterWeb.TimeLineLiveTest do
       |> follow_redirect(conn, Routes.compose_path(conn, :new))
 
     assert html =~ "Compose Watweet"
+  end
+
+  # Broadcast message from test (PubSub)
+  test "user receives notification of new posts in timeline", %{conn: conn} do
+    {:ok, view, _html} = live(conn, "/")
+    [post1, post2] = insert_pair(:post)
+
+    Timeline.broadcast_post_created(post1)
+    Timeline.broadcast_post_created(post2)
+
+    assert has_element?(view, "#new-posts-notice", "Show 2 posts")
   end
 end
