@@ -4,6 +4,7 @@ defmodule WatwitterWeb.TimelineLive do
   alias WatwitterWeb.PostComponent
   alias WatwitterWeb.SVGHelpers
   alias WatwitterWeb.ShowPostComponent
+  alias WatwitterWeb.PostComponent
 
   @impl true
   def mount(_params, session, socket) do
@@ -48,5 +49,12 @@ defmodule WatwitterWeb.TimelineLive do
      socket
      |> update(:new_posts_count, &(&1 + 1))
      |> update(:new_post_ids, &[post.id | &1])}
+  end
+
+  @impl true
+  def handle_info({:post_updated, post}, socket) do
+    send_update(PostComponent, id: post.id)
+
+    {:noreply, socket}
   end
 end
