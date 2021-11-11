@@ -5,7 +5,7 @@ kill_timeout = 5
 processes = []
 
 [deploy]
-  release_command = "/app/entry eval Watwitter.Release.migrate()"
+  release_command = "/app/bin/watwitter eval Watwitter.Release.migrate()"
 
 [env]
 
