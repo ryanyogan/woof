@@ -69,6 +69,17 @@ defmodule WatwitterWeb.ComposeLiveTest do
     refute has_element?(view, "[data-role='photo-preview']")
   end
 
+  test "user sees error when uploading too many files", %{conn: conn} do
+    {:ok, view, _html} = live(conn, Routes.compose_path(conn, :new))
+
+    view
+    |> upload("moria-durins-door.png")
+    |> upload("moria-durins-door.png")
+    |> upload("moria-durins-door.png")
+
+    assert render(view) =~ "Too many files"
+  end
+
   defp cancel_upload(view) do
     view
     |> element("[name='cancel-upload']")
