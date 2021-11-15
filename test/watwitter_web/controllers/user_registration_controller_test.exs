@@ -39,7 +39,7 @@ defmodule WatwitterWeb.UserRegistrationControllerTest do
       # Now do a logged in request
       conn = get(conn, "/")
       response = html_response(conn, 200)
-      assert response =~ "Watwitter"
+      assert response =~ "Woofs by Boops"
     end
 
     test "render errors for invalid data", %{conn: conn} do

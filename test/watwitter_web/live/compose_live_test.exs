@@ -9,8 +9,7 @@ defmodule WatwitterWeb.ComposeLiveTest do
 
     {:ok, _view, html} =
       view
-      |> form("#new-post", post: %{body: "This is awesome"})
-      |> render_submit()
+      |> post_woof("This is awesome")
       |> follow_redirect(conn, Routes.timeline_path(conn, :index))
 
     assert html =~ "This is awesome"
@@ -78,6 +77,25 @@ defmodule WatwitterWeb.ComposeLiveTest do
     |> upload("moria-durins-door.png")
 
     assert render(view) =~ "Too many files"
+  end
+
+  test "user submits post with images", %{conn: conn} do
+    {:ok, view, _html} = live(conn, Routes.compose_path(conn, :new))
+
+    {:ok, timeline, _html} =
+      view
+      |> upload("moria-durins-door.png")
+      |> post_woof("This is awesome")
+      |> follow_redirect(conn, Routes.timeline_path(conn, :index))
+
+    assert render(timeline) =~ "This is awesome"
+    assert has_element?(timeline, "[data-role='post-image']")
+  end
+
+  defp post_woof(view, text) do
+    view
+    |> form("#new-post", post: %{body: text})
+    |> render_submit()
   end
 
   defp cancel_upload(view) do

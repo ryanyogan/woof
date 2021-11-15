@@ -47,6 +47,12 @@ defmodule WatwitterWeb.PostComponent do
           </div>
         <% end %>
 
+        <div class="post-images">
+          <%= for photo_url <- @post.photo_urls do %>
+            <img class="post-image" data-role="post-image" src="<%= photo_url %>" />
+          <% end %>
+        </div>
+
         <div class="post-actions">
           <a class="post-action" href="#">
             <%= SVGHelpers.reply_svg() %>

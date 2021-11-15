@@ -15,6 +15,7 @@ Hooks.InfiniteScroll = {
         this.pushEvent('load-more');
       }
     });
+
     observer.observe(this.el);
   },
 };

@@ -37,7 +37,7 @@ defmodule WatwitterWeb.UserSessionControllerTest do
       # Now do a logged in request
       conn = get(conn, "/")
       response = html_response(conn, 200)
-      assert response =~ "Watwitter"
+      assert response =~ "Woofs by Boops"
     end
 
     test "logs the user in with remember me", %{conn: conn} do

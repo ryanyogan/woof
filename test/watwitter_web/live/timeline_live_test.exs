@@ -9,8 +9,8 @@ defmodule WatwitterWeb.TimeLineLiveTest do
   test "user can visit home page", %{conn: conn} do
     {:ok, view, html} = live(conn, "/")
 
-    assert html =~ "Home"
-    assert render(view) =~ "Home"
+    assert html =~ "Woofs by Boops"
+    assert render(view) =~ "Woofs by Boops"
   end
 
   test "current user can see own avatar", %{conn: conn, user: user} do
@@ -67,7 +67,7 @@ defmodule WatwitterWeb.TimeLineLiveTest do
       |> render_click()
       |> follow_redirect(conn, Routes.compose_path(conn, :new))
 
-    assert html =~ "Compose Watweet"
+    assert html =~ "Compose a Woof"
   end
 
   test "user receives notification of new posts in timeline", %{conn: conn} do
