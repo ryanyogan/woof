@@ -10,10 +10,11 @@
 
 .mobile-container {
   @apply flex flex-col items-center justify-center w-screen h-screen mx-auto text-base text-gray-800 bg-gray-100;
+  padding-bottom: calc(1em + env(safe-area-inset-bottom));
 }
 
 .mobile-display {
-  @apply relative flex flex-col flex-1 w-full overflow-hidden bg-white shadow max-w-md my-2;
+  @apply relative flex flex-col flex-1 w-full overflow-hidden bg-white shadow max-w-md;
 }
 
 .footer {
