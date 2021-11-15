@@ -9,8 +9,7 @@
 // Layout (live)
 
 .mobile-container {
-  @apply flex flex-col items-center justify-center w-screen h-screen mx-auto text-base text-gray-800 bg-gray-100;
-  padding-bottom: calc(1em + env(safe-area-inset-bottom));
+  @apply flex flex-col items-center justify-center w-screen h-screen mx-auto text-base text-gray-800 bg-gray-100 py-10;
 }
 
 .mobile-display {
