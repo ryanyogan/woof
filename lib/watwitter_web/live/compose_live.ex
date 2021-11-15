@@ -10,7 +10,12 @@ defmodule WatwitterWeb.ComposeLive do
     current_user = Accounts.get_user_by_session_token(session["user_token"])
     changeset = Timeline.change_post(%Post{})
 
-    {:ok, assign(socket, current_user: current_user, changeset: changeset)}
+    socket =
+      socket
+      |> assign(current_user: current_user, changeset: changeset)
+      |> allow_upload(:photos, accept: ~w(.jpg .jpeg .png), max_entries: 2)
+
+    {:ok, socket}
   end
 
   @impl true
@@ -38,5 +43,10 @@ defmodule WatwitterWeb.ComposeLive do
       |> Map.put(:action, :insert)
 
     {:noreply, assign(socket, changeset: changeset)}
+  end
+
+  @impl true
+  def handle_event("cancel-upload", %{"ref" => ref}, socket) do
+    {:noreply, cancel_upload(socket, :photos, ref)}
   end
 end

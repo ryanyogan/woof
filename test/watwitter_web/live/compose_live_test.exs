@@ -49,4 +49,43 @@ defmodule WatwitterWeb.ComposeLiveTest do
 
     assert rendered =~ "should be at most 250 character(s)"
   end
+
+  test "user sees image preview when uploading an image", %{conn: conn} do
+    {:ok, view, _html} = live(conn, Routes.compose_path(conn, :new))
+
+    view
+    |> upload("moria-durins-door.png")
+
+    assert has_element?(view, "[data-role='photo-preview']")
+  end
+
+  test "user can cancel an upload", %{conn: conn} do
+    {:ok, view, _html} = live(conn, Routes.compose_path(conn, :new))
+
+    view
+    |> upload("moria-durins-door.png")
+    |> cancel_upload()
+
+    refute has_element?(view, "[data-role='photo-preview']")
+  end
+
+  defp cancel_upload(view) do
+    view
+    |> element("[name='cancel-upload']")
+    |> render_click()
+  end
+
+  defp upload(view, filename) do
+    view
+    |> file_input("#new-post", :photos, [
+      %{
+        name: filename,
+        content: File.read!("test/support/images/#{filename}"),
+        type: "image/png"
+      }
+    ])
+    |> render_upload("moria-durins-door.png")
+
+    view
+  end
 end
