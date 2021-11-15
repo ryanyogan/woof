@@ -7,13 +7,15 @@ defmodule WatwitterWeb.TimelineLive do
   alias WatwitterWeb.PostComponent
 
   @impl true
-  def mount(_params, session, socket) do
+  def mount(params, session, socket) do
     if connected?(socket) do
       Timeline.subscribe()
     end
 
     current_user = Accounts.get_user_by_session_token(session["user_token"])
-    post_ids = Timeline.list_post_ids()
+    page = 1
+    per_page = String.to_integer(params["per_page"] || "10")
+    post_ids = Timeline.list_post_ids(page: page, per_page: per_page)
 
     {:ok,
      assign(socket,
@@ -21,7 +23,9 @@ defmodule WatwitterWeb.TimelineLive do
        new_posts_count: 0,
        new_post_ids: [],
        post_ids: post_ids,
-       current_post_id: nil
+       current_post_id: nil,
+       per_page: per_page,
+       page: page
      )}
   end
 
@@ -44,6 +48,16 @@ defmodule WatwitterWeb.TimelineLive do
   end
 
   @impl true
+  def handle_event("load-more", _, socket) do
+    socket =
+      socket
+      |> update(:page, fn page -> page + 1 end)
+      |> update_post_ids()
+
+    {:noreply, socket}
+  end
+
+  @impl true
   def handle_info({:post_created, post}, socket) do
     {:noreply,
      socket
@@ -56,5 +70,14 @@ defmodule WatwitterWeb.TimelineLive do
     send_update(PostComponent, id: post.id)
 
     {:noreply, socket}
+  end
+
+  defp update_post_ids(socket) do
+    page = socket.assigns.page
+    per_page = socket.assigns.per_page
+    post_ids = Timeline.list_post_ids(page: page, per_page: per_page)
+
+    socket
+    |> update(:post_ids, fn existing -> existing ++ post_ids end)
   end
 end

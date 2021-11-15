@@ -24,7 +24,7 @@ defmodule WatwitterWeb.ComposeLiveTest do
       |> form("#new-post", post: %{body: nil})
       |> render_submit()
 
-    assert rendered =~ "can&apos;t be blank"
+    assert rendered =~ "can&#39;t be blank"
   end
 
   test "user is notified of errors prior to submission", %{conn: conn} do
@@ -35,7 +35,7 @@ defmodule WatwitterWeb.ComposeLiveTest do
       |> form("#new-post", post: %{body: nil})
       |> render_change()
 
-    assert rendered =~ "can&apos;t be blank"
+    assert rendered =~ "can&#39;t be blank"
   end
 
   test "user is notified that post is over 250 characters", %{conn: conn} do

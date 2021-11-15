@@ -63,14 +63,9 @@ defmodule Watwitter.Timeline do
       [%Post{id: 1}, ...]
 
   """
-  def get_posts(ids, opts \\ []) do
-    page = Keyword.get(opts, :page, 1)
-    per_page = Keyword.get(opts, :per_page, 10)
-
+  def get_posts(ids) do
     from(p in Post,
       where: p.id in ^ids,
-      offset: ^((page - 1) * per_page),
-      limit: ^per_page,
       order_by: [desc: p.id]
     )
     |> Repo.all()

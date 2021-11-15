@@ -9,7 +9,11 @@ defmodule WatwitterWeb.PostComponent do
     posts = Timeline.get_posts(list_of_ids)
 
     Enum.map(list_of_assigns, fn assigns ->
-      Map.put(assigns, :post, Enum.find(posts, fn post -> post.id == assigns.id end))
+      Map.put(
+        assigns,
+        :post,
+        Enum.find(posts, &(&1.id == assigns.id))
+      )
     end)
   end
 

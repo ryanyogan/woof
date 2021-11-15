@@ -1,5 +1,5 @@
 defmodule WatwitterWeb.TimeLineLiveTest do
-  use WatwitterWeb.ConnCase, async: false
+  use WatwitterWeb.ConnCase
   import Phoenix.LiveViewTest
   import Watwitter.Factory
   alias Watwitter.Timeline
@@ -103,6 +103,18 @@ defmodule WatwitterWeb.TimeLineLiveTest do
     assert view |> post_like_count(updated_post, "3") |> has_element?()
   end
 
+  test "user can see older posts with infinite scroll", %{conn: conn} do
+    [oldest, newest] = insert_pair(:post)
+    {:ok, view, _html} = live(conn, "/?per_page=1")
+
+    view
+    |> load_more_posts()
+    |> render_hook("load-more")
+
+    assert view |> timeline_post(newest) |> has_element?()
+    assert view |> timeline_post(oldest) |> has_element?()
+  end
+
   defp update_post(post, changes) do
     post
     |> Ecto.Changeset.change(changes)
@@ -139,5 +151,9 @@ defmodule WatwitterWeb.TimeLineLiveTest do
 
   defp new_posts_notice(view, text \\ nil) do
     element(view, "#new-posts-notice", text)
+  end
+
+  defp load_more_posts(view) do
+    element(view, "#load-more", "Loading...")
   end
 end
