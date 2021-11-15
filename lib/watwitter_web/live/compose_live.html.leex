@@ -3,10 +3,10 @@
 		<%= live_redirect to: Routes.timeline_path(@socket, :index) do %>
 			<%= SVGHelpers.back_svg() %>
 		<% end %>
-		<h1 class="header-title">Compose Watweet</h1>
+		<h1 class="header-title">Compose a Woof</h1>
 	</div>
 
-	<button form="new-post" class="compose-btn">Post</button>
+	<button form="new-post" class="compose-btn">Woof!</button>
 </header>
 
 <div class="body">
@@ -16,7 +16,7 @@
 		<%= f = form_for @changeset, "#", phx_submit: "save", phx_change: "validate", id: "new-post", class: "compose-form" %>
 			<div class="compose-fields">
 				<div class="compose-box">
-					<%= textarea f, :body, placeholder: "What's happening?", class: "compose-textarea" %>
+					<%= textarea f, :body, placeholder: "What's boops doing?", class: "compose-textarea" %>
 				</div>
 				<%= error_tag f, :body %>
 
